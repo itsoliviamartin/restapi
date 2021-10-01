@@ -1,0 +1,125 @@
+swagger: "2.0"
+info:
+  description: "This an example REST API built with Go lang that represents a list of ablums that lists all albums with a GET request to the endpoint /albums, create a album and add to the list with a POST request to /albums, and you can get the ablums by id as a path parameter to /albums/:id."
+  version: "1.0.0"
+  title: "REST API Go Lang Tutorial"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "olivia.martin@fmr.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+paths:
+  /albums:
+    get:
+      tags:
+      - "albums"
+      summary: "returns all albums in the albums slice"
+      description: "Calls getAlbums() function which returns all the albums contained in the albums slice."
+      operationId: "getAlbums"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Status OK"
+          schema:
+            $ref: "#/definitions/AlbumsSlice"
+    post:
+      tags:
+      - "albums"
+      summary: "creates a new album and adds to the albums slice. Returns album created."
+      description: "Calls postAlbums() function which returns JSON  of the album created"
+      operationId: "addAlbum"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Album object that needs to be added to the albums slice"
+        required: true
+        schema:
+          $ref: "#/definitions/Album"
+      responses:
+        "201":
+          description: "Created album"
+        "400":
+          description: "Bad request to create a new album"
+  /albums/{id}:
+    get:
+      tags:
+      - "albums"
+      summary: "returns all the albums of the id passed in as a path parameter"
+      description: "calls getAlbumsByID() function to get the album associated with the id path parameter"
+      operationId: "getAlbumsById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        type: "integer"
+        format: "string"
+        description: "Album object that needs to be retrieved by id in the albums slice"
+        required: true
+      responses:
+        "200":
+          description: "successful retrieval"
+          schema:
+            $ref: "#/definitions/Album"
+        "404":
+          description: "album not found"
+definitions:
+  Album:
+    type: "object"
+    required:
+    - "id"
+    - "title"
+    - "artist"
+    - "price"
+    properties:
+      id:
+        type: "string"
+        example: "1"
+      title:
+        type: "string"
+        example: "Clouds"
+      artist:
+        type: "string"
+        example: "NF"
+      price:
+        type: "number"
+        example: "56.99"
+    xml:
+      name: "Album"
+  AlbumsSlice:
+    type: "array"
+    items:
+      type: "object"
+      required:
+      - "id"
+      - "title"
+      - "artist"
+      - "price"
+      properties:
+        id: 
+          type: "string"
+        title:
+          type: "string"
+        artist:
+          type: "string"
+        price:
+          type: "number"
+      example:
+        - id: "1"
+          title: "Clouds"
+          artist: "NF"
+          price: "56.99"
+        - id: "2"
+          title: "Jeru"
+          artist: "Gerry Mulligan"
+          price: "17.99"
+        - id: "3"
+          title: "Lost"
+          artist: "NF"
+          price: "39.99"
