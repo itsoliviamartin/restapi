@@ -115,20 +115,3 @@ func getAlbumByQuery(c *gin.Context) {
 	// return HTTP 404 error if album isn't found
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
-
-// func getAlbumByIDQuery(c *gin.Context) {
-// 	var a album
-// 	if c.BindJSON(&a) == nil {
-// 		log.Println(a.ID)
-// 	}
-
-// for _, a := range albums {
-// 	if c.Bind(&a) == nil && a.ID == c.Query("id") {
-// 		log.Println("====== Bind By Query String ======")
-// 		log.Println(a.ID)
-// 		log.Println(a.Title)
-// 		log.Println(a.Artist)
-// 		log.Println(a.Price)
-// 	}
-// }
-// }
