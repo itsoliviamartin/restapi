@@ -93,8 +93,8 @@ func getAlbumByPath(c *gin.Context) {
 	c.IndentedJSON(http.StatusNotFound, gin.H{"message": "album not found"})
 }
 
-// getAlbumByID locates the album whose ID values matches the ID
-// parameter sent by the client, then returns that album as a response.
+// getAlbumByQuery locates the album whose ID, title, artist or price matches the
+// query parameter sent by the client, then returns that album as a response.
 func getAlbumByQuery(c *gin.Context) {
 	// retrieves the id path param from URL
 	id := c.Query("id")

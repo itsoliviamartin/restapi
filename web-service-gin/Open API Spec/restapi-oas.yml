@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  description: "This an example REST API built with Go lang that represents a list of ablums that lists all albums with a GET request to the endpoint /albums, create a album and add to the list with a POST request to /albums, and you can get the ablums by id as a path parameter to /albums/:id."
+  description: "This an example REST API built with Go lang that represents a list of ablums. A GET request to the endpoint /inventory returns all of the albums within the list. A POST request to the endpoint /albums creates a new album and adds it to the inventory. A GET request to the endpoint /albums:id gets the album with the id passed as the path parameter. A GET request to the endpoint /albums gets the album based on the query parameters of the id, price, artist, or title that the client sends in the request."
   version: "1.0.0"
   title: "REST API Go Lang Tutorial"
   termsOfService: "http://swagger.io/terms/"
@@ -10,7 +10,7 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 paths:
-  /albums:
+  /inventory:
     get:
       tags:
       - "albums"
@@ -23,7 +23,8 @@ paths:
         "200":
           description: "Status OK"
           schema:
-            $ref: "#/definitions/AlbumsSlice"
+            $ref: "#/definitions/Inventory"
+  /albums:
     post:
       tags:
       - "albums"
@@ -46,6 +47,47 @@ paths:
           description: "Created album"
         "400":
           description: "Bad request to create a new album"
+    get:
+      tags:
+      - "albums"
+      summary: "gets an album by query parameters"
+      description: "Calls getAlbumByQuery() function which locates the album whose id, title, artist or price matches the query parameter sent by the client, then returns that album as a response"
+      operationId: "getAlbumQuery"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        type: "string"
+        format: "string"
+        description: "Album object that needs to be retrieved by id"
+        required: true
+      - name: "title"
+        in: "query"
+        type: "string"
+        format: "string"
+        description: "Album object that needs to be retrieved by title"
+        required: true
+      - name: "artist"
+        in: "query"
+        type: "string"
+        format: "string"
+        description: "Album object that needs to be retrieved by artist"
+        required: true
+      - name: "price"
+        in: "query"
+        type: "string"
+        format: "string"
+        description: "Album object that needs to be retrieved by price"
+        required: true
+      responses:
+        "200":
+          description: "Status OK. Album retrieved by query parameter"
+          schema:
+            $ref: "#/definitions/Album"
+        "404":
+          description: "Album not found"
+      
   /albums/{id}:
     get:
       tags:
@@ -88,11 +130,11 @@ definitions:
         type: "string"
         example: "NF"
       price:
-        type: "number"
+        type: "string"
         example: "56.99"
     xml:
       name: "Album"
-  AlbumsSlice:
+  Inventory:
     type: "array"
     items:
       type: "object"
@@ -109,7 +151,7 @@ definitions:
         artist:
           type: "string"
         price:
-          type: "number"
+          type: "string"
       example:
         - id: "1"
           title: "Clouds"
