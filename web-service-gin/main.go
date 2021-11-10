@@ -1,9 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/getkin/kin-openapi/openapi3filter"
+	legacyrouter "github.com/getkin/kin-openapi/routers/legacy"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,14 +31,83 @@ var albums = []album{
 
 // assign handler function to an endpoint path "/albums"
 func main() {
-	// initialize gin router
-	router := gin.Default()
-	router.GET("/inventory", getAlbums)
-	router.POST("/albums", postAlbums)
-	router.GET("/albums/:id", getAlbumByPath)
-	router.GET("/albums", getAlbumByQuery)
+	// returns an empty context, used to derive other contexts
+	ctx := context.Background()
+	// returns address of loader that deserializes openapi3 context document
+	loader := &openapi3.Loader{Context: ctx}
+	// loads OAS document and deserializes openapi3 it with the loader. Returns
+	// as a doc or blank identifier
+	doc, _ := loader.LoadFromFile("openapi3/petstore.json")
+	// validates the doc and assigns it as a blank identifier
+	_ = doc.Validate(ctx)
+	// defines a new router for the doc
+	router, _ := legacyrouter.NewRouter(doc)
+	// httpReq, _ := http.NewRequest(http.MethodGet, "/inventory", nil)
+	httpReq, _ := http.NewRequest(http.MethodGet, "/v2/pet/findByStatus?status=sold", nil)
 
-	router.Run("localhost:9000")
+	// Find route
+	route, pathParams, _ := router.FindRoute(httpReq)
+
+	// Validate request
+	requestValidationInput := &openapi3filter.RequestValidationInput{
+		Request:    httpReq,
+		PathParams: pathParams,
+		Route:      route,
+	}
+
+	if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
+		panic(err)
+	}
+
+	var (
+		respStatus      = 200
+		respContentType = "application/json"
+		respBody        = bytes.NewBufferString(`{}`)
+	)
+
+	log.Println("Response:", respStatus)
+	responseValidationInput := &openapi3filter.ResponseValidationInput{
+		RequestValidationInput: requestValidationInput,
+		Status:                 respStatus,
+		Header:                 http.Header{"Content-Type": []string{respContentType}},
+	}
+
+	if respBody != nil {
+		data, _ := json.Marshal(respBody)
+		responseValidationInput.SetBodyBytes(data)
+	}
+
+	// write handler and creating server
+
+	// http.ListenAndServe(":8080", router)
+
+	// Validate response.
+	if err := openapi3filter.ValidateResponse(ctx, responseValidationInput); err != nil {
+		panic(err)
+	}
+
+	// switch reqtype {
+	// case "GET":
+	// 	if reqtype.URL == "/inventory" {
+	// 		httpReq, _ := http.NewRequest(http.MethodGet, "/inventory", nil)
+	// 	}
+	// 	if reqtype.URL == "/albums/:id" {
+	// 		httpReq, _ := http.NewRequest(http.MethodGet, "/albums/:id", nil)
+	// 	}
+	// 	if reqtype.URL == "/albums" {
+	// 		httpReq, _ := http.NewRequest(http.MethodGet, "/albums/", nil)
+	// 	}
+	// case "POST":
+	// 	httpReq, _ := http.NewRequest(http.MethodPost, "/albums", nil)
+	// }
+
+	// initialize gin router
+	// router := gin.Default()
+	// router.GET("/inventory", getAlbums)
+	// router.POST("/albums", postAlbums)
+	// router.GET("/albums/:id", getAlbumByPath)
+	// router.GET("/albums", getAlbumByQuery)
+	// router.Run("localhost:9000")
 }
 
 // getAlbums responds with the list of all albums as JSON.

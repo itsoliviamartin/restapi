@@ -1,0 +1,241 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "description": "This an example REST API built with Go lang that represents a list of ablums. A GET request to the endpoint /inventory returns all of the albums within the list. A POST request to the endpoint /albums creates a new album and adds it to the inventory. A GET request to the endpoint /albums:id gets the album with the id passed as the path parameter. A GET request to the endpoint /albums gets the album based on the query parameters of the id, price, artist, or title that the client sends in the request.",
+    "version": "1.0.0",
+    "title": "REST API Go Lang Tutorial",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Olivia Martin",
+      "email": "olivia.martin@fmr.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "paths": {
+    "/inventory": {
+      "get": {
+        "tags": [
+          "getInventory"
+        ],
+        "summary": "returns all albums in the albums slice",
+        "description": "Calls getAlbums() function which returns all the albums contained in the albums slice.",
+        "operationId": "getInventory",
+        "parameters": [
+          {
+            "name": "AppId",
+            "in": "header",
+            "description": "AppId it authenticate the application",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_]*$",
+              "maxLength": 8
+            }
+          },
+          {
+            "name": "AppName",
+            "in": "header",
+            "description": "identifies application calling the service",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unid",
+            "in": "header",
+            "description": "unique identifier for correlation of logs",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              },
+              "application/xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          }
+        }
+      }
+  },
+    "/albums": {
+      "post": {
+        "tags": [
+          "addAlbum"
+        ],
+        "summary": "creates a new album and adds to the albums slice. Returns album created.",
+        "description": "Calls postAlbums() function which returns JSON  of the album created",
+        "operationId": "addAlbum",
+        "parameters": [
+          {
+            "name": "AppId",
+            "in": "header",
+            "description": "AppId it authenticate the application",
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_]*$",
+              "maxLength": 8
+            }
+          },
+          {
+            "name": "AppName",
+            "in": "header",
+            "description": "identifies application calling the service",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unid",
+            "in": "header",
+            "description": "unique identifier for correlation of logs",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Request to add album object to the albums slice",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Album"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Album"
+            }
+          }
+        },
+        "required": true
+      },
+      "responses": {
+        "200": {
+          "description": "Status OK"
+        },
+        "404": {
+          "description": "Status Not Found"
+        },
+        "default": {
+          "description": "default response",
+          "content": {
+            "application/json": {}
+          }
+        }
+      }
+    }
+  },
+  "/albums/:id" : {
+    "get": {
+      "tags": [
+        "getAlbumById"
+      ],
+      "summary": "Gets the album by id and returns it.",
+      "description": "Calls getAlbumByPath() function which returns JSON  of the album retrieved by id",
+      "operationId": "getAlbumById",
+      "parameters": [
+        {
+          "name": "AppId",
+          "in": "header",
+          "description": "AppId it authenticate the application",
+          "schema": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_]*$",
+            "maxLength": 8
+          }
+        },
+        {
+          "name": "AppName",
+          "in": "header",
+          "description": "identifies application calling the service",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "unid",
+          "in": "header",
+          "description": "unique identifier for correlation of logs",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "default": {
+          "description": "default response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Album"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/Album"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  },
+  "components": {
+    "schemas": {
+      "Album": {
+        "required": [
+          "id",
+          "title",
+          "artist",
+          "price"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "1"
+          },
+          "title": {
+            "type": "string",
+            "example": "Clouds"
+          },
+          "artist": {
+            "type": "string",
+            "example": "NF"
+          },
+          "price": {
+            "type": "string",
+            "example": "56.99"
+          }
+        }
+      },
+      "Inventory": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Album"
+        }
+      }
+    },
+  "securitySchemes": {
+    "bearerToken": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "OAuth or JWT"
+     }
+    }
+  }
+}
